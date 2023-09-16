@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviour
             forward = new Vector3(forward.x, 0, forward.z);
             forward = Vector3.Normalize(forward);
             finalRot = Quaternion.LookRotation(forward);
+            Debug.Log("test");
         }
         else{
             finalRot = Quaternion.LookRotation(displacement);
