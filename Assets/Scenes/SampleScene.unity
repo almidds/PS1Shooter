@@ -533,14 +533,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5786d732017ce64b80725a8da2350b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
   focus: {fileID: 2043910444}
-  distance: 2.8
-  shoulderOffset: 1.5
-  rotationSpeed: 90
+  followDistanceNormal: 2.5
+  followDistanceAiming: 1.5
+  shoulderOffsetNormal: 2
+  shoulderOffsetAiming: 3
+  rotationSpeed: 30
   minVerticalAngle: -30
   maxVerticalAngle: 60
-  player: {fileID: 0}
-  testTrans: {fileID: 425062384}
 --- !u!1 &1021271768
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,7 +692,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f2f497796024c940a7bc7202149d3f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3.5
+  moveSpeedNormal: 3.5
+  moveSpeedAiming: 1.5
   cameraPosition: {fileID: 963194228}
   rotSpeed: 20
 --- !u!1 &1909611801

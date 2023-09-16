@@ -5,8 +5,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Vector2 input;
+    float moveSpeed;
     [SerializeField]
-    float moveSpeed = 3.5f;
+    float moveSpeedNormal, moveSpeedAiming;
     Vector3 displacement;
     new Rigidbody rigidbody;
 
@@ -19,8 +20,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float rotSpeed = 20f;
 
+    Camera mainCamera;
+
     void Start(){
         rigidbody = GetComponent<Rigidbody>();
+        mainCamera = FindObjectOfType<Camera>();
     }
     
 
@@ -28,11 +32,12 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if(Movement()){
+            moveSpeed = UpdateMoveSpeed(Aiming());
             rigidbody.MovePosition(transform.position + displacement*moveSpeed*Time.deltaTime);
             UpdateRotation();
         }
         if(Aiming()){
-            Debug.Log("Test");
+            UpdateRotation();
         }
     }
 
@@ -57,11 +62,29 @@ public class PlayerController : MonoBehaviour
     }
 
     void UpdateRotation(){
-        Quaternion finalRot = Quaternion.LookRotation(displacement);
+        Quaternion finalRot;
+        if(Aiming()){
+            forward = cameraPosition.localRotation * Vector3.forward;
+            forward = new Vector3(forward.x, 0, forward.z);
+            forward = Vector3.Normalize(forward);
+            finalRot = Quaternion.LookRotation(forward);
+        }
+        else{
+            finalRot = Quaternion.LookRotation(displacement);
+        }
         transform.rotation = Quaternion.Lerp(transform.rotation, finalRot, Time.deltaTime * rotSpeed);
     }
 
     bool Aiming(){
         return Input.GetKey(KeyCode.Mouse1);
+    }
+
+    float UpdateMoveSpeed(bool isAiming){
+        if(isAiming){
+            return moveSpeedAiming;
+        }
+        else{
+            return moveSpeedNormal;
+        }
     }
 }

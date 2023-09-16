@@ -5,26 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class OrbitCamera:MonoBehaviour{
     [SerializeField]
-    Transform focus = default;
-
-    [Range(1f,20f)]
-    public float distance = 5f, shoulderOffset = 2f;
-
-    Vector3 focusPoint, previousFocusPoint;
-
-    Vector2 orbitAngles = new Vector2(0f, 0f);
-    [SerializeField, Range(1f, 360f)]
-    float rotationSpeed = 90f;
-    [SerializeField, Range(-89f, 89f)]
-    float minVerticalAngle = -30f, maxVerticalAngle = 60f;
-    float lastManualRotationTime;
-
-    [SerializeField]
     Transform player;
 
-    public Transform testTrans;
-
     Camera regularCamera;
+
     Vector3 CameraHalfExtends{
         get{
             Vector3 halfExtends;
@@ -35,6 +19,25 @@ public class OrbitCamera:MonoBehaviour{
         }
     }
 
+    [SerializeField]
+    Transform focus = default;
+    Vector3 focusPoint;
+
+    float followDistance, shoulderOffset;
+    [SerializeField, Range(1f,20f)]
+    float followDistanceNormal = 2.5f, followDistanceAiming = 1.5f, shoulderOffsetNormal = 2f, shoulderOffsetAiming = 3f;
+
+    Vector2 orbitAngles = new Vector2(0f, 0f);
+
+    [SerializeField, Range(1f, 360f)]
+    float rotationSpeed = 30f;
+
+    [SerializeField, Range(-89f, 89f)]
+    float minVerticalAngle = -30f, maxVerticalAngle = 60f;
+
+    [SerializeField]
+    float updateOffsetSpeed = 20f;
+
     void Awake(){
         regularCamera = GetComponent<Camera>();
         Cursor.lockState = CursorLockMode.Locked;
@@ -44,6 +47,7 @@ public class OrbitCamera:MonoBehaviour{
     }
 
     void LateUpdate() {
+        UpdateOffsets(Aiming());
 
         Quaternion lookRotation;
         if(ManualRotation()){
@@ -58,9 +62,7 @@ public class OrbitCamera:MonoBehaviour{
         Vector3 lookDirection = lookRotation * Vector3.forward;
         Vector3 sideDirection = lookRotation * Vector3.right;
 
-
-
-        Vector3 forwardOffset, sideOffset;
+        Vector3 followOffset, sideOffset;
         if (Physics.Raycast(
             focusPoint, sideDirection, out RaycastHit sideHit, shoulderOffset + CameraHalfExtends.x
         )){
@@ -74,30 +76,14 @@ public class OrbitCamera:MonoBehaviour{
         // Account for obstacles forward
         Vector3 lookPosition = newFocusPoint;
         if (Physics.BoxCast(
-            newFocusPoint, CameraHalfExtends, -lookDirection, out RaycastHit forwardHit, lookRotation, distance - regularCamera.nearClipPlane
+            newFocusPoint, CameraHalfExtends, -lookDirection, out RaycastHit forwardHit, lookRotation, followDistance - regularCamera.nearClipPlane
         )) {
-            forwardOffset = -lookDirection * (forwardHit.distance + regularCamera.nearClipPlane);
+            followOffset = -lookDirection * (forwardHit.distance + regularCamera.nearClipPlane);
         }
         else{
-            forwardOffset = -lookDirection * distance;
+            followOffset = -lookDirection * followDistance;
         }
-        lookPosition += forwardOffset;
-
-
-
-        testTrans.position = focusPoint + sideOffset;
-
-        // if (Physics.Raycast(
-        //     lookPosition, sideDirection, out RaycastHit sideHit, shoulderOffset
-        // )) {
-        //     sideOffset = sideDirection * sideHit.distance;
-        //     Debug.Log(sideHit.distance);
-        // }
-        // else{
-        //     sideOffset = sideDirection * shoulderOffset;
-        // }
-
-        // lookPosition += sideOffset;
+        lookPosition += followOffset;
         transform.SetPositionAndRotation(lookPosition, lookRotation);
     }
 
@@ -110,7 +96,6 @@ public class OrbitCamera:MonoBehaviour{
         const float minInput = 0.001f;
         if (input.x < -minInput || input.x > minInput || input.y < -minInput || input.y > minInput){
             orbitAngles += rotationSpeed * Time.unscaledDeltaTime * input;
-            lastManualRotationTime = Time.unscaledTime;
             return true;
         }
         return false;
@@ -130,6 +115,21 @@ public class OrbitCamera:MonoBehaviour{
     void OnValidate(){
         if(maxVerticalAngle < minVerticalAngle){
             maxVerticalAngle = minVerticalAngle;
+        }
+    }
+
+    bool Aiming(){
+        return Input.GetKey(KeyCode.Mouse1);
+    }
+
+    void UpdateOffsets(bool isAiming){
+        if(isAiming){
+            followDistance = Mathf.Lerp(followDistance, followDistanceAiming, Time.deltaTime * updateOffsetSpeed);
+            shoulderOffset = Mathf.Lerp(shoulderOffset, shoulderOffsetAiming, Time.deltaTime * updateOffsetSpeed);
+        }
+        else{
+            followDistance = Mathf.Lerp(followDistance, followDistanceNormal, Time.deltaTime * updateOffsetSpeed);
+            shoulderOffset = Mathf.Lerp(shoulderOffset, shoulderOffsetNormal, Time.deltaTime * updateOffsetSpeed);
         }
     }
 
