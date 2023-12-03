@@ -22,9 +22,12 @@ public class PlayerController : MonoBehaviour
 
     Camera mainCamera;
 
+    Animator animator; 
+
     void Start(){
         rigidbody = GetComponent<Rigidbody>();
         mainCamera = FindObjectOfType<Camera>();
+        animator = GetComponent<Animator>();
     }
     
 
@@ -34,7 +37,11 @@ public class PlayerController : MonoBehaviour
         if(Movement()){
             moveSpeed = UpdateMoveSpeed(Aiming());
             rigidbody.MovePosition(transform.position + displacement*moveSpeed*Time.deltaTime);
+            animator.SetFloat("SpeedPercent", 1);
             UpdateRotation();
+        }
+        else{
+            animator.SetFloat("SpeedPercent", 0);
         }
         if(Aiming()){
             UpdateRotation();
@@ -67,10 +74,10 @@ public class PlayerController : MonoBehaviour
             forward = cameraPosition.localRotation * Vector3.forward;
             forward = new Vector3(forward.x, 0, forward.z);
             forward = Vector3.Normalize(forward);
-            finalRot = Quaternion.LookRotation(forward);
+            finalRot = Quaternion.LookRotation(-forward);
         }
         else{
-            finalRot = Quaternion.LookRotation(displacement);
+            finalRot = Quaternion.LookRotation(-displacement);
         }
         transform.rotation = Quaternion.Lerp(transform.rotation, finalRot, Time.deltaTime * rotSpeed);
     }
