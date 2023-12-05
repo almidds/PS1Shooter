@@ -5056,7 +5056,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 3
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.0734247, g: 0.28700897, b: 0.6226415, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -5146,10 +5146,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 261dba4c2ca25174680f007641f0f2c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  renderTexture: {fileID: 8400000, guid: c5fee93b455adf240b868fb7c75686ff, type: 2}
   fogMat: {fileID: 2100000, guid: d531ac084f0a45746bcedd43db8380f0, type: 2}
+  CRTMat: {fileID: 2100000, guid: da20608d3cd949041b1620ebfbd85f3d, type: 2}
   fogColor: {r: 0.6226415, g: 0.6020826, b: 0.6020826, a: 1}
   fogDensity: 0.023
   fogOffset: 0
+  curvature: 7
+  vignetteWidth: 10
 --- !u!1 &966829064 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6115962314670491096, guid: ff0074f2cea8b6744a227c16c510a79d, type: 3}

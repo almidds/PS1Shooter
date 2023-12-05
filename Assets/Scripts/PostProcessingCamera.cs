@@ -8,7 +8,10 @@ public class PostProcessingCamera : MonoBehaviour{
     private Camera cam;
 
     [SerializeField]
-    Material fogMat;
+    private RenderTexture renderTexture;
+
+    [SerializeField]
+    Material fogMat, CRTMat;
 
     [SerializeField]
     private Color fogColor;
@@ -18,6 +21,9 @@ public class PostProcessingCamera : MonoBehaviour{
 
     [SerializeField, Range(0.0f, 100.0f)]
     private float fogOffset;
+
+    [SerializeField, Range(0.0f, 100.0f)]
+    private float curvature = 5.0f, vignetteWidth;
 
     void Start() {
         cam = GetComponent<Camera>();
@@ -29,7 +35,11 @@ public class PostProcessingCamera : MonoBehaviour{
         fogMat.SetVector("_FogColor", fogColor);
         fogMat.SetFloat("_FogDensity", fogDensity);
         fogMat.SetFloat("_FogOffset", fogOffset);
-        Graphics.Blit(src, dest, fogMat);
+        Graphics.Blit(src, renderTexture, fogMat);
+
+        CRTMat.SetFloat("_Curvature", curvature);
+        CRTMat.SetFloat("_VignetteWidth", vignetteWidth);
+        Graphics.Blit(renderTexture, dest, CRTMat);
     }
 
 }
