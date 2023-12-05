@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Hidden/Fog"{
     Properties{
         _MainTex ("Texture", 2D) = "white" {}
@@ -14,16 +16,31 @@ Shader "Hidden/Fog"{
             struct appdata{
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                half4 color : COLOR0;
             };
 
             struct interpolators{
-                float2 uv : TEXCOORD0;
+                noperspective float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                half4 color : COLOR0;
             };
 
             interpolators vert (appdata v){
                 interpolators o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+
+                // Vertex
+                float4 snapToPixel = UnityObjectToClipPos(v.vertex);
+                float4 vertex = snapToPixel;
+                vertex.xyz = snapToPixel.xyz / snapToPixel.w;
+                vertex.x = floor(256 * vertex.x) / 256;
+                vertex.y = floor(224 * vertex.y) / 224;
+                vertex.xyz *= snapToPixel.w;
+                o.vertex = vertex;
+
+                // Vertex lighting
+                o.color = v.color * UNITY_LIGHTMODEL_AMBIENT;
+
+                // o.vertex = UnityObjectToClipPos(v.vertex)
                 o.uv = v.uv;
                 return o;
             }
